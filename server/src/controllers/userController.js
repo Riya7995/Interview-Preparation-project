@@ -89,6 +89,10 @@ const signupUser = async (req, res) => {
     let hashedPassword = await bcrypt.hash(password, 10);
     userData.password = hashedPassword;
 
+    // Profile Image
+    if (req.file) {
+      userData.profileImage = req.file.filename;
+    }
     let userAdded = await UserModel.create(userData);
 
     return res.status(201).json({ msg: "Signup Successfully Done", userAdded });
@@ -127,7 +131,7 @@ const loginUser = async (req, res) => {
       },
       process.env.JWT_SECRET_KEY,
       {
-        expiresIn: "1d",
+        expiresIn: "2d",
       },
     );
     return res.status(200).json({ msg: "Login Successfull", token });
@@ -227,6 +231,10 @@ const updateProfile = async (req, res) => {
           .json({ msg: "Bio Should not exceed 200 Characters." });
       }
       updateData.bio = bio;
+    }
+    // Profile Image
+    if (req.file) {
+      userData.profileImage = req.file.filename;
     }
     // Update the user profile
     const updatedUser = await UserModel.findByIdAndUpdate(userId, updateData, {

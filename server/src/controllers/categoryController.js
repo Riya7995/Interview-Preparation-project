@@ -1,5 +1,5 @@
 const CategoryModel = require("../models/categoryModel");
-const { isValid, isValidCategoryName } = require("../utils/validator");
+const { isValid, isValidCategoryName ,isValidObjectId} = require("../utils/validator");
 //create category (admin)
 const createCategory = async (req, res) => {
   try {
@@ -192,7 +192,11 @@ const updateCategory = async (req, res) => {
       categoryData,
       { new: true },
     );
-
+   if (!updatedCategory) {
+      return res.status(404).json({
+        msg: "Category Not Found",
+      });
+    }
     return res.status(200).json({
       msg: "Category updated successfully",
       category: updatedCategory,
