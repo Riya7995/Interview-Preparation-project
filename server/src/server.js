@@ -25,6 +25,9 @@ app.use("/interview", interviewRoute);
 app.use("/ai", aiRoute);
 app.use("/attempts", attemptRoute);
 
+app.use("/", (req, res) => {
+  res.json({ msg: "Hello from Interview Prep App" });
+});
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 const PORT = process.env.PORT;
 app.listen(PORT, (err) =>
