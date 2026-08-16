@@ -309,6 +309,58 @@ const getSingleAttempt = async (req, res) => {
     return res.status(500).json({ msg: "Internal Server Error" });
   }
 };
+// Get My Performance Analytics
+const getMyAnalytics = async (req, res) => {
+  try {
+    let userId = req.userId;
+
+    // Total Attempts
+    const totalAttempts = await AttemptModel.countDocuments({ userId });
+
+    if (totalAttempts === 0) {
+      return res.status(404).json({ msg: "No Attempts Found" });
+    }
+
+    // Completed Attempts
+    const completedAttempts = await AttemptModel.countDocuments({
+      userId,
+      status: "completed",
+    });
+
+    // Pending Attempts
+    const pendingAttempts = totalAttempts - completedAttempts;
+
+    // Completed Attempts Data
+    const attempts = await AttemptModel.find({ userId, status: "completed" });
+
+    let totalScore = 0;
+
+    attempts.forEach((attempt) => {
+      totalScore += attempt.score || 0;
+    });
+
+    let averageScore = 0;
+
+    if (completedAttempts > 0) {
+      averageScore = totalScore / completedAttempts;
+      averageScore = Number(averageScore.toFixed(2));
+    }
+
+    return res.status(200).json({
+      msg: "Performance Analytics Fetched",
+      analytics: {
+        totalAttempts,
+        completedAttempts,
+        pendingAttempts,
+        totalScore,
+        averageScore,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ msg: "Internal Server Error" });
+  }
+};
 
 module.exports = {
   startInterview,
@@ -317,4 +369,5 @@ module.exports = {
   completeInterview,
   getMyAttempts,
   getSingleAttempt,
+  getMyAnalytics
 };
