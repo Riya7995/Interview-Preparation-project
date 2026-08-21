@@ -25,10 +25,6 @@ const Login = () => {
   const submitHandler = async (e) => {
     e.preventDefault();
 
-    if (!formData.email || !formData.password) {
-      toast.error("Please fill all fields");
-      return;
-    }
     try {
       setLoading(true);
 
@@ -40,7 +36,7 @@ const Login = () => {
       localStorage.setItem("token", response.data.token);
       toast.success(response.data.msg || "Login Successfull");
 
-      console.log(response);
+      navigate("/dashboard");
     } catch (error) {
       console.log(error.response.data.msg);
       toast.error(error.response.data.msg || "Login Failed");
@@ -190,10 +186,14 @@ const Login = () => {
               {/* Login Button */}
               <button
                 type="submit"
+                disabled={loading}
                 className="group flex w-full items-center justify-center gap-2 rounded-2xl bg-indigo-600 py-3.5 text-sm font-semibold transition hover:bg-indigo-500 active:scale-[0.99]"
               >
-                Sign In
-                <FiArrowRight className="transition-transform group-hover:translate-x-1" />
+                {loading ? "Signing In..." : "Sign In"}
+
+                {!loading && (
+                  <FiArrowRight className="transition-transform group-hover:translate-x-1" />
+                )}
               </button>
             </form>
 
