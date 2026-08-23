@@ -9,6 +9,7 @@ import {
   FiSettings,
   FiUser,
   FiZap,
+  FiX,
 } from "react-icons/fi";
 import { toast } from "react-toastify";
 
@@ -94,7 +95,10 @@ const Navbar = () => {
         <div className="flex items-center gap-2">
           {/* Profile */}
 
-          <button className="hidden items-center gap-2 rounded-xl border border-slate-800 bg-slate-900 px-3 py-2 md:flex">
+          <button
+            className="hidden items-center gap-2 rounded-xl border border-slate-800 bg-slate-900 px-3 py-2 md:flex"
+            onClick={() => navigate("/profile")}
+          >
             <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-600 text-xs font-bold">
               U
             </div>
@@ -107,6 +111,7 @@ const Navbar = () => {
           <button
             className="hidden h-10 w-10 items-center justify-center rounded-xl border border-slate-800 bg-slate-900 text-slate-400 transition hover:border-slate-700 hover:text-white md:flex"
             title="Settings"
+            onClick={() => navigate("/settings")}
           >
             <FiSettings size={17} />
           </button>
@@ -122,12 +127,79 @@ const Navbar = () => {
           </button>
 
           {/* Mobile Menu UI */}
-
-          <button className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-800 bg-slate-900 text-slate-300 lg:hidden">
-            <FiMenu size={20} />
+          <button
+            className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-800 bg-slate-900 text-slate-300 lg:hidden"
+            onClick={() => setMenuOpen(!menuOpen)}
+          >
+            {menuOpen ? <FiX size={20} /> : <FiMenu size={20} />}
           </button>
         </div>
       </div>
+
+      {menuOpen && (
+        <div className="border-t border-slate-800 bg-slate-950 px-4 py-4 lg:hidden">
+          <nav className="space-y-1">
+            {navLinks.map((link) => {
+              const Icon = link.icon;
+
+              return (
+                <NavLink
+                  key={link.path}
+                  to={link.path}
+                  onClick={() => setMenuOpen(false)}
+                  className={({ isActive }) =>
+                    `flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition ${
+                      isActive
+                        ? "bg-indigo-500/10 text-indigo-400"
+                        : "text-slate-400 hover:bg-slate-900 hover:text-white"
+                    }`
+                  }
+                >
+                  <Icon size={18} />
+
+                  {link.name}
+                </NavLink>
+              );
+            })}
+
+            {/* Profile */}
+
+            <button
+              onClick={() => {
+                setMenuOpen(false);
+                navigate("/profile");
+              }}
+              className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-slate-400 transition hover:bg-slate-900 hover:text-white"
+            >
+              <FiUser size={18} />
+              Profile
+            </button>
+
+            {/* Settings */}
+
+            <button
+              onClick={() => {
+                setMenuOpen(false);
+                navigate("/settings");
+              }}
+              className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-slate-400 transition hover:bg-slate-900 hover:text-white"
+            >
+              <FiSettings size={18} />
+              Settings
+            </button>
+
+            {/* Logout */}
+
+            <button
+              onClick={handleLogout}
+              className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-red-400 transition hover:bg-red-500/10"
+            >
+              <FiLogOut size={18} />
+              Logout
+            </button>
+          </nav>
+        </div>
+      )}
     </header>
   );
 };

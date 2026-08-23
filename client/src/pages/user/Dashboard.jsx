@@ -1,31 +1,95 @@
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import api from "../../services/api";
+
 import {
   FiArrowRight,
   FiBarChart2,
+  FiBookOpen,
   FiCheckCircle,
   FiClock,
   FiPlay,
   FiTarget,
   FiTrendingUp,
   FiZap,
-  FiBookOpen,
 } from "react-icons/fi";
 
 import Navbar from "../../components/user/Navbar";
 
 const Dashboard = () => {
+  const navigate = useNavigate();
+
+  const [user, setUser] = useState(null);
+  const [analytics, setAnalytics] = useState({
+    totalAttempts: 0,
+    completedAttempts: 0,
+    pendingAttempts: 0,
+    averageScore: 0,
+  });
+  const [attempts, setAttempts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Dashboard Data
+  const getDashboardData = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const config = {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      };
+
+      const [profile, stats, activity] = await Promise.allSettled([
+        api.get("/users/get", config),
+        api.get("/attempts/my-analytics", config),
+        api.get("/attempts/my-attempts", config),
+      ]);
+
+      if (profile.status === "fulfilled") {
+        setUser(profile.value.data.user);
+      }
+
+      if (stats.status === "fulfilled") {
+        setAnalytics(stats.value.data.analytics);
+      }
+
+      if (activity.status === "fulfilled") {
+        setAttempts(activity.value.data.attempts || []);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    getDashboardData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-slate-950">
+        <div className="h-9 w-9 animate-spin rounded-full border-2 border-slate-700 border-t-indigo-500" />
+      </div>
+    );
+  }
+
+  const averageScore = Math.round(analytics.averageScore || 0);
+  const latestAttempt = attempts[0];
+
   return (
     <div className="min-h-screen bg-slate-950 text-white">
-      {/* Navbar */}
-
       <Navbar />
 
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        {/* Welcome Section */}
+        {/* Welcome */}
 
         <section className="mb-8 flex flex-col justify-between gap-5 md:flex-row md:items-end">
           <div>
             <p className="mb-2 text-sm font-medium text-indigo-400">
-              Welcome back 👋
+              Welcome back, {user.fullName}👋
             </p>
 
             <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
@@ -38,7 +102,10 @@ const Dashboard = () => {
             </p>
           </div>
 
-          <button className="group flex w-fit items-center gap-2 rounded-xl bg-indigo-600 px-5 py-3 text-sm font-semibold transition hover:bg-indigo-500">
+          <button
+            className="group flex w-fit items-center gap-2 rounded-xl bg-indigo-600 px-5 py-3 text-sm font-semibold hover:bg-indigo-500"
+            onClick={() => navigate("/interviews")}
+          >
             <FiPlay size={16} />
             Start Interview
             <FiArrowRight
@@ -51,19 +118,63 @@ const Dashboard = () => {
         {/* Stats */}
 
         <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <StatCard icon={<FiTarget />} title="Total Interviews" value="12" />
+          {/* Total Interviews */}
 
-          <StatCard icon={<FiCheckCircle />} title="Completed" value="8" />
+          <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-5">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-400">
+              <FiTarget />
+            </div>
 
-          <StatCard icon={<FiTrendingUp />} title="Average Score" value="78%" />
+            <p className="mt-5 text-xs text-slate-500">Total Interviews</p>
 
-          <StatCard icon={<FiClock />} title="Practice Hours" value="14h" />
+            <p className="mt-1 text-2xl font-bold">{analytics.totalAttempts}</p>
+          </div>
+
+          {/* Completed */}
+
+          <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-5">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-400">
+              <FiCheckCircle />
+            </div>
+
+            <p className="mt-5 text-xs text-slate-500">Completed</p>
+
+            <p className="mt-1 text-2xl font-bold">
+              {analytics.completedAttempts}
+            </p>
+          </div>
+
+          {/* Average Score */}
+
+          <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-5">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-500/10 text-violet-400">
+              <FiTrendingUp />
+            </div>
+
+            <p className="mt-5 text-xs text-slate-500">Average Score</p>
+
+            <p className="mt-1 text-2xl font-bold">{averageScore}%</p>
+          </div>
+
+          {/* Pending */}
+
+          <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-5">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/10 text-amber-400">
+              <FiClock />
+            </div>
+
+            <p className="mt-5 text-xs text-slate-500">Pending</p>
+
+            <p className="mt-1 text-2xl font-bold">
+              {analytics.pendingAttempts}
+            </p>
+          </div>
         </section>
 
-        {/* Main Content */}
+        {/* Main */}
 
         <section className="mt-6 grid gap-6 lg:grid-cols-3">
-          {/* Performance Card */}
+          {/* Performance */}
 
           <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-6 lg:col-span-2">
             <div className="mb-6 flex items-center justify-between">
@@ -76,47 +187,47 @@ const Dashboard = () => {
               </div>
 
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-400">
-                <FiBarChart2 size={19} />
+                <FiBarChart2 />
               </div>
             </div>
 
             <div className="flex flex-col gap-6 sm:flex-row sm:items-center">
-              {/* Score */}
-
               <div className="relative flex h-32 w-32 shrink-0 items-center justify-center rounded-full border-8 border-indigo-500/20">
-                <div className="absolute inset-1 rounded-full border-4 border-indigo-500/70 border-r-transparent" />
+                <div
+                  className="absolute inset-1 rounded-full border-4 border-indigo-500/70 border-r-transparent"
+                  style={{
+                    transform: `rotate(${averageScore * 1.8 - 45}deg)`,
+                  }}
+                />
 
                 <div className="relative text-center">
-                  <p className="text-3xl font-bold">78%</p>
+                  <p className="text-3xl font-bold">{averageScore}%</p>
 
                   <p className="text-[10px] text-slate-600">Average</p>
                 </div>
               </div>
 
-              {/* Performance Info */}
-
               <div>
-                <p className="text-lg font-semibold">Good progress!</p>
+                <p className="text-lg font-semibold">Keep practicing!</p>
 
                 <p className="mt-2 max-w-md text-sm leading-6 text-slate-500">
-                  Your performance is improving. Keep practicing to reach your
-                  target score.
+                  Keep practicing interviews and improve your score with
+                  AI-powered feedback.
                 </p>
 
-                <button className="mt-4 text-xs font-semibold text-indigo-400 transition hover:text-indigo-300">
-                  View full performance →
+                <button
+                  className="mt-4 text-xs font-semibold text-indigo-400 hover:text-indigo-300"
+                  onClick={() => useNavigate("/performance")}
+                >
+                  View performance →
                 </button>
               </div>
             </div>
           </div>
 
-          {/* Quick Practice */}
+          {/* Practice */}
 
           <div className="relative overflow-hidden rounded-2xl border border-indigo-500/20 bg-linear-to-br from-indigo-600/20 via-violet-600/10 to-slate-900 p-6">
-            {/* Glow */}
-
-            <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-indigo-500/10 blur-3xl" />
-
             <div className="relative">
               <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-500/15 text-indigo-400">
                 <FiZap size={21} />
@@ -125,11 +236,13 @@ const Dashboard = () => {
               <h2 className="mt-5 text-xl font-bold">Practice Interview</h2>
 
               <p className="mt-2 text-sm leading-6 text-slate-500">
-                Start a realistic mock interview and get AI-powered feedback on
-                your answers.
+                Start a mock interview and improve your interview skills.
               </p>
 
-              <button className="group mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 py-3 text-sm font-semibold transition hover:bg-indigo-500">
+              <button
+                className="group mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 py-3 text-sm font-semibold hover:bg-indigo-500"
+                onClick={() => navigate("/practice")}
+              >
                 Start Practice
                 <FiArrowRight className="transition-transform group-hover:translate-x-1" />
               </button>
@@ -149,107 +262,120 @@ const Dashboard = () => {
               </p>
             </div>
 
-            <button className="text-xs font-semibold text-indigo-400 transition hover:text-indigo-300">
+            <button className="text-xs font-semibold text-indigo-400 hover:text-indigo-300">
               View all
             </button>
           </div>
 
-          {/* Activity */}
+          {latestAttempt ? (
+            <div className="flex flex-col gap-4 rounded-xl border border-slate-800 bg-slate-950/60 p-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-400">
+                  <FiCheckCircle />
+                </div>
 
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between rounded-xl border border-slate-800 bg-slate-950/60 p-4">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-400">
-                <FiCheckCircle />
+                <div>
+                  <p className="text-sm font-medium">
+                    {latestAttempt.interviewId.title || "Interview"}
+                  </p>
+
+                  <p className="mt-1 text-xs text-slate-600">
+                    {latestAttempt.status}
+                  </p>
+                </div>
               </div>
 
-              <div>
-                <p className="text-sm font-medium">Technical Interview</p>
+              <div className="flex items-center justify-between sm:gap-6">
+                <span className="text-xs text-slate-600">
+                  {latestAttempt.interviewId.difficulty || "Practice"}
+                </span>
 
-                <p className="mt-1 text-xs text-slate-600">
-                  Completed recently
-                </p>
+                <span className="text-sm font-semibold text-emerald-400">
+                  {latestAttempt.score || 0}%
+                </span>
               </div>
             </div>
+          ) : (
+            <div className="rounded-xl border border-dashed border-slate-800 p-8 text-center">
+              <p className="text-sm text-slate-500">
+                No interview attempts yet.
+              </p>
 
-            <div className="flex items-center justify-between sm:justify-end sm:gap-6">
-              <span className="text-xs text-slate-600">20 min</span>
-
-              <span className="text-sm font-semibold text-emerald-400">
-                82%
-              </span>
+              <button
+                onClick={() => navigate("/interviews")}
+                className="mt-3 text-xs font-semibold text-indigo-400"
+              >
+                Start your first interview →
+              </button>
             </div>
-          </div>
+          )}
         </section>
 
-        {/* Bottom Quick Links */}
+        {/* Quick Links */}
 
-        <section className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <QuickCard
-            icon={<FiPlay />}
-            title="Mock Interview"
-            description="Practice a real interview"
-          />
+        <section className="mt-6 grid gap-4 sm:grid-cols-3">
+          {/* Mock Interview */}
 
-          <QuickCard
-            icon={<FiBookOpen />}
-            title="Practice Questions"
-            description="Improve your technical skills"
-          />
+          <button className="group flex items-center gap-4 rounded-2xl border border-slate-800 bg-slate-900/40 p-4 text-left hover:border-indigo-500/30">
+            <div
+              className="flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-400"
+              onClick={() => navigate("/interviews")}
+            >
+              <FiPlay />
+            </div>
 
-          <QuickCard
-            icon={<FiBarChart2 />}
-            title="Your Performance"
-            description="Analyze your progress"
-          />
+            <div className="flex-1">
+              <p className="text-sm font-semibold">Mock Interview</p>
+
+              <p className="mt-1 text-xs text-slate-600">
+                Practice a real interview
+              </p>
+            </div>
+
+            <FiArrowRight className="text-slate-700 group-hover:text-indigo-400" />
+          </button>
+
+          {/* Practice Questions */}
+
+          <button className="group flex items-center gap-4 rounded-2xl border border-slate-800 bg-slate-900/40 p-4 text-left hover:border-indigo-500/30">
+            <div
+              className="flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-400"
+              onClick={() => navigate("/practice")}
+            >
+              <FiBookOpen />
+            </div>
+
+            <div className="flex-1">
+              <p className="text-sm font-semibold">Practice Questions</p>
+
+              <p className="mt-1 text-xs text-slate-600">Improve your skills</p>
+            </div>
+
+            <FiArrowRight className="text-slate-700 group-hover:text-indigo-400" />
+          </button>
+
+          {/* Performance */}
+          <button className="group flex items-center gap-4 rounded-2xl border border-slate-800 bg-slate-900/40 p-4 text-left hover:border-indigo-500/30">
+            <div
+              className="flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-400"
+              onClick={() => navigate("/performance")}
+            >
+              <FiBarChart2 />
+            </div>
+
+            <div className="flex-1">
+              <p className="text-sm font-semibold">Performance</p>
+
+              <p className="mt-1 text-xs text-slate-600">
+                Analyze your progress
+              </p>
+            </div>
+
+            <FiArrowRight className="text-slate-700 group-hover:text-indigo-400" />
+          </button>
         </section>
       </main>
     </div>
-  );
-};
-
-// Stat Card
-
-const StatCard = ({ icon, title, value }) => {
-  return (
-    <div className="group rounded-2xl border border-slate-800 bg-slate-900/50 p-5 transition hover:-translate-y-0.5 hover:border-slate-700">
-      <div className="flex items-center justify-between">
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-400">
-          {icon}
-        </div>
-
-        <FiArrowRight
-          size={16}
-          className="text-slate-700 transition group-hover:translate-x-1 group-hover:text-slate-500"
-        />
-      </div>
-
-      <p className="mt-5 text-xs text-slate-500">{title}</p>
-
-      <p className="mt-1 text-2xl font-bold">{value}</p>
-    </div>
-  );
-};
-
-// Quick Card
-
-const QuickCard = ({ icon, title, description }) => {
-  return (
-    <button className="group flex items-center gap-4 rounded-2xl border border-slate-800 bg-slate-900/40 p-4 text-left transition hover:border-indigo-500/30 hover:bg-slate-900">
-      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-400">
-        {icon}
-      </div>
-
-      <div className="min-w-0 flex-1">
-        <p className="text-sm font-semibold text-white">{title}</p>
-
-        <p className="mt-1 text-xs text-slate-600">{description}</p>
-      </div>
-
-      <FiArrowRight
-        size={16}
-        className="text-slate-700 transition group-hover:translate-x-1 group-hover:text-indigo-400"
-      />
-    </button>
   );
 };
 
