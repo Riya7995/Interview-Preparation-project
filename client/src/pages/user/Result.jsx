@@ -1,38 +1,74 @@
-import { useNavigate } from "react-router-dom";
-import {
-  FiArrowLeft,
-  FiCheckCircle,
-  FiClock,
-  FiTarget,
-  FiTrendingUp,
-} from "react-icons/fi";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { FiArrowLeft, FiCheckCircle, FiClock, FiTarget } from "react-icons/fi";
+import { toast } from "react-toastify";
+import api from "../../services/api";
 
 const Result = () => {
+  const { id } = useParams();
   const navigate = useNavigate();
+
+  const [attempt, setAttempt] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const token = localStorage.getItem("token");
+  const config = {
+    headers: { Authorization: `Bearer ${token}` },
+  };
+
+  // Fetch result
+  useEffect(() => {
+    const fetchResult = async () => {
+      try {
+        const response = await api.get(`/attempts/${id}`, config);
+
+        setAttempt(response.data.attempt);
+      } catch (error) {
+        toast.error(error.response.data.msg || "Unable to load result");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchResult();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-slate-950">
+        <div className="h-9 w-9 animate-spin rounded-full border-2 border-slate-700 border-t-indigo-500" />
+      </div>
+    );
+  }
+
+  if (!attempt) return null;
 
   return (
     <div className="min-h-screen bg-slate-950 text-white">
       <main className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
-        {/* Header */}
-        <div className="mb-8">
-          <button
-            onClick={() => navigate("/dashboard")}
-            className="flex items-center gap-2 text-sm text-slate-400 hover:text-white"
-          >
-            <FiArrowLeft />
-            Dashboard
-          </button>
+        <button
+          onClick={() => navigate("/dashboard")}
+          className="flex items-center gap-2 text-sm text-slate-400 hover:text-white"
+        >
+          <FiArrowLeft />
+          Dashboard
+        </button>
 
-          <p className="mt-6 text-sm text-indigo-400">Interview Completed</p>
+        <div className="mb-8 mt-6">
+          <p className="text-sm text-indigo-400">Interview Completed</p>
 
           <h1 className="mt-2 text-3xl font-bold">Your Interview Result</h1>
+
+          <p className="mt-2 text-sm text-slate-500">
+            {attempt.interviewId.title || "Interview"}
+          </p>
         </div>
 
-        {/* Score */}
+        {/* Stats */}
         <div className="grid gap-5 md:grid-cols-3">
           <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6 text-center">
             <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-indigo-500/10 text-2xl font-bold text-indigo-400">
-              82
+              {attempt.score}%
             </div>
 
             <p className="mt-4 text-sm text-slate-500">Overall Score</p>
@@ -41,17 +77,21 @@ const Result = () => {
           <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
             <FiTarget className="text-xl text-emerald-400" />
 
-            <p className="mt-5 text-2xl font-bold">8/10</p>
+            <p className="mt-5 text-2xl font-bold">
+              {attempt.questions.length || 0}
+            </p>
 
-            <p className="mt-1 text-sm text-slate-500">Questions Completed</p>
+            <p className="text-sm text-slate-500">Questions</p>
           </div>
 
           <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
             <FiClock className="text-xl text-amber-400" />
 
-            <p className="mt-5 text-2xl font-bold">24 min</p>
+            <p className="mt-5 text-2xl font-bold capitalize">
+              {attempt.status}
+            </p>
 
-            <p className="mt-1 text-sm text-slate-500">Time Taken</p>
+            <p className="text-sm text-slate-500">Status</p>
           </div>
         </div>
 
@@ -64,29 +104,25 @@ const Result = () => {
           </div>
 
           <p className="mt-5 text-sm leading-7 text-slate-400">
-            Your answers showed a good understanding of the core concepts. Try
-            to give more structured explanations and include practical examples
-            when answering technical questions.
+            {attempt.feedback || "No feedback available."}
           </p>
-
-          <div className="mt-6 rounded-xl bg-indigo-500/5 p-5">
-            <div className="flex items-center gap-2 text-sm font-semibold text-indigo-400">
-              <FiTrendingUp />
-              Improvement Area
-            </div>
-
-            <p className="mt-3 text-sm leading-6 text-slate-500">
-              Focus on explaining concepts with real-world examples.
-            </p>
-          </div>
         </div>
 
-        <button
-          onClick={() => navigate("/interviews")}
-          className="mt-6 rounded-xl bg-indigo-600 px-5 py-3 text-sm font-semibold hover:bg-indigo-500"
-        >
-          Practice Again
-        </button>
+        <div className="mt-6 flex flex-wrap gap-3">
+          <button
+            onClick={() => navigate("/interviews")}
+            className="rounded-xl bg-indigo-600 px-5 py-3 text-sm font-semibold hover:bg-indigo-500"
+          >
+            Practice Again
+          </button>
+
+          <button
+            onClick={() => navigate("/history")}
+            className="rounded-xl border border-slate-800 px-5 py-3 text-sm text-slate-400 hover:text-white"
+          >
+            View History
+          </button>
+        </div>
       </main>
     </div>
   );

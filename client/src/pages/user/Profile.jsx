@@ -44,7 +44,7 @@ const Profile = () => {
         },
       };
 
-      const response = await api.get("/users/get", config);
+      const response = await api.get("/users/profile", config);
 
       const user = response.data.user;
 

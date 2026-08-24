@@ -42,13 +42,17 @@ const Dashboard = () => {
 
       const [profile, stats, activity] = await Promise.allSettled([
         api.get("/users/get", config),
-        api.get("/attempts/my-analytics", config),
+        api.get("/attempts/analytics/my-analytics", config),
         api.get("/attempts/my-attempts", config),
       ]);
 
+      
       if (profile.status === "fulfilled") {
         setUser(profile.value.data.user);
       }
+
+      
+      
 
       if (stats.status === "fulfilled") {
         setAnalytics(stats.value.data.analytics);
