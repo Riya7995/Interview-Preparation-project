@@ -33,10 +33,17 @@ const Login = () => {
         password: formData.password,
       });
 
+      const role = response.data.user.role;
+
       localStorage.setItem("token", response.data.token);
+      localStorage.setItem("role", role);
       toast.success(response.data.msg || "Login Successfull");
 
-      navigate("/dashboard");
+      if (role === "admin") {
+        navigate("/admin/dashboard");
+      } else {
+        navigate("/dashboard");
+      }
     } catch (error) {
       console.log(error.response.data.msg);
       toast.error(error.response.data.msg || "Login Failed");

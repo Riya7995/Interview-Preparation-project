@@ -34,7 +34,7 @@ const Interviews = () => {
       try {
         const [interviewRes, categoryRes] = await Promise.all([
           api.get("/interview/all-interviews?limit=20", config),
-          api.get("/categories/get-categories", config),
+          api.get("/categories/all-categories", config),
         ]);
 
         setInterviews(interviewRes.data.interviews || []);
