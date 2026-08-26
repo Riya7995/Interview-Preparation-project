@@ -8,6 +8,8 @@ import Interview from "./pages/user/Interview";
 import Result from "./pages/user/Result";
 import Performance from "./pages/user/Performance";
 import History from "./pages/user/History";
+import Settings from "./pages/user/Settings";
+import Practice from "./pages/user/Practice";
 
 import ProtectedRoute from "./routes/ProtectedRoute";
 import AdminRoute from "./routes/AdminRoute";
@@ -35,6 +37,8 @@ const App = () => {
           <Route path="/result/:id" element={<Result />} />
           <Route path="/performance" element={<Performance />} />
           <Route path="/history" element={<History />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/practice" element={<Practice />} />
         </Route>
 
         {/* Admin Routes */}
@@ -51,3 +55,4 @@ const App = () => {
 };
 
 export default App;
+

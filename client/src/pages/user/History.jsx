@@ -113,12 +113,21 @@ const History = () => {
                     <p className="text-[11px] text-slate-600">Score</p>
                   </div>
 
-                  <button
-                    onClick={() => navigate(`/result/${attempt._id}`)}
-                    className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-800 text-slate-400 hover:bg-indigo-600 hover:text-white"
-                  >
-                    <FiChevronRight />
-                  </button>
+                  {attempt.status === "completed" ? (
+                    <button
+                      onClick={() => navigate(`/result/${attempt._id}`)}
+                      className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-800 text-slate-400 hover:bg-indigo-600 hover:text-white"
+                    >
+                      <FiChevronRight />
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => navigate(`/interview/${attempt._id}`)}
+                      className="rounded-xl bg-indigo-600 px-4 py-2 text-xs font-semibold hover:bg-indigo-500"
+                    >
+                      Continue
+                    </button>
+                  )}
                 </div>
               </div>
             ))}

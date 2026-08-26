@@ -217,7 +217,7 @@ const Dashboard = () => {
 
                 <button
                   className="mt-4 text-xs font-semibold text-indigo-400 hover:text-indigo-300"
-                  onClick={() => useNavigate("/performance")}
+                  onClick={() => navigate("/performance")}
                 >
                   View performance →
                 </button>
@@ -262,7 +262,10 @@ const Dashboard = () => {
               </p>
             </div>
 
-            <button className="text-xs font-semibold text-indigo-400 hover:text-indigo-300">
+            <button
+              className="text-xs font-semibold text-indigo-400 hover:text-indigo-300"
+              onClick={() => navigate("/history")}
+            >
               View all
             </button>
           </div>
@@ -316,11 +319,11 @@ const Dashboard = () => {
         <section className="mt-6 grid gap-4 sm:grid-cols-3">
           {/* Mock Interview */}
 
-          <button className="group flex items-center gap-4 rounded-2xl border border-slate-800 bg-slate-900/40 p-4 text-left hover:border-indigo-500/30">
-            <div
-              className="flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-400"
-              onClick={() => navigate("/interviews")}
-            >
+          <button
+            className="group flex items-center gap-4 rounded-2xl border border-slate-800 bg-slate-900/40 p-4 text-left hover:border-indigo-500/30"
+            onClick={() => navigate("/interviews")}
+          >
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-400">
               <FiPlay />
             </div>
 
@@ -337,11 +340,11 @@ const Dashboard = () => {
 
           {/* Practice Questions */}
 
-          <button className="group flex items-center gap-4 rounded-2xl border border-slate-800 bg-slate-900/40 p-4 text-left hover:border-indigo-500/30">
-            <div
-              className="flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-400"
-              onClick={() => navigate("/practice")}
-            >
+          <button
+            className="group flex items-center gap-4 rounded-2xl border border-slate-800 bg-slate-900/40 p-4 text-left hover:border-indigo-500/30"
+            onClick={() => navigate("/practice")}
+          >
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-400">
               <FiBookOpen />
             </div>
 
@@ -355,11 +358,11 @@ const Dashboard = () => {
           </button>
 
           {/* Performance */}
-          <button className="group flex items-center gap-4 rounded-2xl border border-slate-800 bg-slate-900/40 p-4 text-left hover:border-indigo-500/30">
-            <div
-              className="flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-400"
-              onClick={() => navigate("/performance")}
-            >
+          <button
+            className="group flex items-center gap-4 rounded-2xl border border-slate-800 bg-slate-900/40 p-4 text-left hover:border-indigo-500/30"
+            onClick={() => navigate("/performance")}
+          >
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-400">
               <FiBarChart2 />
             </div>
 

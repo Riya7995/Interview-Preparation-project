@@ -38,15 +38,13 @@ const Interview = () => {
           return;
         }
 
-        const category =
-          data.interviewId.categoryId ||
-          data.interviewId.categoryId ||
-          "Technical";
+        const categoryId =
+          data.interviewId.categoryId?._id || data.interviewId.categoryId;
 
         const generated = await api.post(
           "/ai/generate-questions",
           {
-            category,
+            category: categoryId,
             difficulty: data.interviewId.difficulty || "medium",
             noOfQuestions: 5,
           },

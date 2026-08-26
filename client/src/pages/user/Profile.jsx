@@ -159,7 +159,7 @@ const Profile = () => {
         },
       };
 
-      const response = await api.delete("/users/profile", config);
+      const response = await api.delete("/users/delete", config);
 
       toast.success(response.data.msg || "Account deleted");
       console.log(response.data);

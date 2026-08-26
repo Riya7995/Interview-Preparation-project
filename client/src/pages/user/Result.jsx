@@ -22,9 +22,17 @@ const Result = () => {
       try {
         const response = await api.get(`/attempts/${id}`, config);
 
-        setAttempt(response.data.attempt);
+        const attemptData = response.data.attempt;
+
+        if (attemptData.status !== "completed") {
+          toast.info("This interview is not completed yet");
+          navigate(`/interview/${id}`);
+          return;
+        }
+
+        setAttempt(attemptData);
       } catch (error) {
-        toast.error(error.response.data.msg || "Unable to load result");
+        toast.error(error.response?.data?.msg || "Unable to load result");
       } finally {
         setLoading(false);
       }
