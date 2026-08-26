@@ -6,6 +6,7 @@ import {
   FiBriefcase,
   FiBarChart2,
   FiArrowRight,
+  FiLogOut,
 } from "react-icons/fi";
 import { toast } from "react-toastify";
 import api from "../../services/api";
@@ -76,15 +77,31 @@ const AdminDashboard = () => {
     },
   ];
 
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
+    toast.success("Logged out successfully");
+    navigate("/login");
+  };
+
   return (
     <div className="min-h-screen bg-slate-950 text-white">
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <div className="mb-8">
-          <p className="text-sm text-indigo-400">Administration</p>
-          <h1 className="mt-1 text-3xl font-bold">Admin Dashboard</h1>
-          <p className="mt-2 text-sm text-slate-500">
-            Manage your Interview Prep platform.
-          </p>
+        <div className="flex mb-8 items-start justify-between gap-4">
+          <div>
+            <p className="text-sm text-indigo-400">Administration</p>
+            <h1 className="mt-1 text-3xl font-bold">Admin Dashboard</h1>
+            <p className="mt-2 text-sm text-slate-500">
+              Manage your Interview Prep platform.
+            </p>
+          </div>
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-2 rounded-xl border border-red-500/10 bg-red-500/10 px-4 py-2.5 text-sm font-medium text-red-400 hover:bg-red-500/15"
+          >
+            <FiLogOut />
+            Logout
+          </button>
         </div>
 
         {loading ? (

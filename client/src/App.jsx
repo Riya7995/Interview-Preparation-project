@@ -11,8 +11,8 @@ import History from "./pages/user/History";
 import Settings from "./pages/user/Settings";
 import Practice from "./pages/user/Practice";
 
-import ProtectedRoute from "./Routes/ProtectedRoute";
-import AdminRoute from "./Routes/AdminRoute";
+import ProtectedRoute from "./routes/ProtectedRoute";
+import AdminRoute from "./routes/AdminRoute";
 
 // Admin Pages
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -55,4 +55,3 @@ const App = () => {
 };
 
 export default App;
-
